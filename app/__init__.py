@@ -25,4 +25,4 @@ db = MongoEngine(app)
 def import_views():
     from app import views as views
 
-import_views() 
+import_views()
