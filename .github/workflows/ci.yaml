@@ -10,6 +10,11 @@ on:
       - release/v*
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   Lint:
     runs-on: ubuntu-latest
@@ -61,20 +66,11 @@ jobs:
           pip install -r dev-requirements.txt
       - name: Run tests with pytest
         run: |
-          pytest --doctest-modules --junitxml=junit/test-results.xml --cov=app --cov-report=xml --cov-report=html --cov-report=term-missing
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: junit/test-results.xml
-        # always run this step to publish test results when there are test failures
-        if: ${{ always() }}
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: htmlcov
-        if: ${{ always() }}  
+          pytest --doctest-modules --junitxml=junit/test-results.xml --cov=app --cov-report=xml --cov-report=html --cov-report=term-missing --cov-report=term
+      - name: Display coverage summary Github Steps Summary
+        run: |
+          echo '### Test Coverage Report' >> $GITHUB_STEP_SUMMARY
+          coverage report >> $GITHUB_STEP_SUMMARY
 
       - name: Pytest coverage comment in PR
         uses: MishaKav/pytest-coverage-comment@main
