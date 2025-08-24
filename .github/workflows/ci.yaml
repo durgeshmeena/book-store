@@ -44,6 +44,9 @@ jobs:
   Test:
     runs-on: ubuntu-latest
     needs: Lint
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      MONGO_URI: ${{ secrets.MONGO_URI }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
