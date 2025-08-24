@@ -1,0 +1,17 @@
+
+## ---  unit testing ---
+# pytest configuration
+[tool.pytest.ini_options]
+minversion = "8.4"
+testpaths = [
+    "tests"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:flask_mongoengine"
+]
+
+# coverage configuration
+[tool.coverage.run]
+omit = [".*", "*/site-packages/*", "tests/*"]
+[tool.coverage.report]
+fail_under = 80
