@@ -22,5 +22,7 @@ app.logger.info(f"Debug mode is {'on' if app.config['DEBUG'] else 'off'}.")
 
 db = MongoEngine(app)
 
+def import_views():
+    from app import views as views
 
-from app import views
+import_views() 

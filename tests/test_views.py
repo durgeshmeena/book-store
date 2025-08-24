@@ -32,7 +32,7 @@ def test_client():
 def test_home_route(test_client):
     response = test_client.get("/")
     assert response.status_code == 200
-    assert b"LMS for managing Books, Members, Transaction.." in response.data
+    assert b"book store app for managing Books, Members, Transaction.." in response.data
 
 
 def test_books_route(test_client):

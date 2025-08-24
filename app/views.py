@@ -6,8 +6,15 @@ from mongoengine.errors import DoesNotExist
 
 from app import app
 
-from .controllers import *
-from .models import *
+from .controllers import (
+    LoginForm,
+    SignupForm,
+    admin_login,
+    flash_errors,
+    is_logout,
+    login_required,
+)
+from .models import Book, Member, Transaction
 
 
 @app.route("/")
@@ -16,7 +23,7 @@ def home():
 
 
 @app.errorhandler(404)
-def invalid_route(e):
+def invalid_route():
     return render_template("404.html"), 404
 
 

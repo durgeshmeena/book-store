@@ -1,10 +1,10 @@
 import os
 from os import environ
 
+import certifi
 from dotenv import find_dotenv, load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-import certifi
 
 # ---------------------------------
 # Default Config
