@@ -37,7 +37,7 @@ def test_app():
     )
 
     disconnect()
-    db = MongoEngine(app)
+    MongoEngine(app)
     yield
     disconnect()
 
@@ -53,11 +53,11 @@ def test_create_member():
     )
     assert member.username == "testuser"
     assert member.email == "test@example.com"
-    assert member.admin == False
-    assert member.active == False
+    assert not member.admin
+    assert not member.active
     member.set_password("password")
     assert member.check_password("password")
-    assert member.is_admin() == False
+    assert not member.is_admin()
 
 
 def test_create_book():
@@ -89,4 +89,4 @@ def test_create_transaction():
     assert transaction.book == "1"
     assert transaction.member == "1"
     assert transaction.date == "2023-01-01"
-    assert transaction.borrow == True
+    assert transaction.borrow

@@ -18,7 +18,7 @@ def setup_db():
     }
 
     disconnect()
-    db = MongoEngine(app)
+    MongoEngine(app)
     yield
     disconnect()
 

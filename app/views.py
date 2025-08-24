@@ -90,13 +90,13 @@ def signup():
             form_password = form.password.data
 
             try:
-                existing_email = Member.objects.get(email=form_email)
+                Member.objects.get(email=form_email)
 
                 flash("Email already registered!!", "danger")
                 # return redirect( url_for('signup') )
             except DoesNotExist:
                 try:
-                    existing_user = Member.objects.get(username=form_username)
+                    Member.objects.get(username=form_username)
                     flash("Username already registered!!", "danger")
                     # return redirect( url_for('signup') )
 
@@ -150,11 +150,11 @@ def dashboard():
 @admin_login
 def add_book():
     if request.method == "POST":
-        title = request.form.get("title")
-        author = request.form.get("author")
-        isbn = request.form.get("isbn")
-        publisher = request.form.get("publisher")
-        page = request.form.get("page")
+        request.form.get("title")
+        request.form.get("author")
+        request.form.get("isbn")
+        request.form.get("publisher")
+        request.form.get("page")
 
         frappe_api_url = "https://frappe.io/api/method/frappe-library?"
 
@@ -276,12 +276,12 @@ def remove(name, id):
             flash("Cannot Remove admin", "danger")
             return {"name": "members", "message": "Cannot Remove admin"}
         else:
-            deleted_data = user[0].delete()
+            user[0].delete()
             flash("User Deleted SuccessFully", "danger")
             return {"name": "members", "message": "user deleted successfully"}
 
     elif name == "books":
-        deleted_data = Book.objects(id=id).delete()
+        Book.objects(id=id).delete()
         flash("Book Deleted SuccessFully", "danger")
         return {"name": "books", "message": "book deleted successfully"}
 

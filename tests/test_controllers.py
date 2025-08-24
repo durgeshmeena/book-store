@@ -22,7 +22,7 @@ def test_app():
     )
 
     disconnect()
-    db = MongoEngine(app)
+    MongoEngine(app)
     yield
     disconnect()
 

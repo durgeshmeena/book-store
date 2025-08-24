@@ -60,7 +60,7 @@ class SignupForm(FlaskForm):
 
 def flash_errors(form):
     """Flashes form errors"""
-    for field, errors in form.errors.items():
+    for _field, errors in form.errors.items():
         for error in errors:
             flash(f"{error}", "danger")
 
