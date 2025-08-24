@@ -74,6 +74,7 @@ jobs:
         with:
           name: coverage-report
           path: htmlcov
+        if: ${{ always() }}  
 
       - name: Pytest coverage comment in PR
         uses: MishaKav/pytest-coverage-comment@main
@@ -84,3 +85,4 @@ jobs:
           junitxml-path: junit/test-results.xml
           junitxml-title: Pytest Unit Tests Summary
           report-only-changed-files: true
+        if: ${{ always() }}  
