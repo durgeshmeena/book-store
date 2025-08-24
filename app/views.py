@@ -23,7 +23,8 @@ def home():
 
 
 @app.errorhandler(404)
-def invalid_route():
+def invalid_route(error):
+    app.logger.error("Invalid route accessed: %s", error)
     return render_template("404.html"), 404
 
 
