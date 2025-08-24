@@ -1,13 +1,14 @@
 import logging
+
 from flask import Flask
 from flask.logging import default_handler
 from flask_mongoengine import MongoEngine
 
-app = Flask(__name__, static_url_path='', static_folder='static')
-app.config.from_object('config')
+app = Flask(__name__, static_url_path="", static_folder="static")
+app.config.from_object("config")
 
 # format logs
-formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] %(message)s')
+formatter = logging.Formatter("[%(asctime)s] [%(process)d] [%(levelname)s] %(message)s")
 handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 # Remove default Flask handler and add custom handler
@@ -21,5 +22,7 @@ app.logger.info(f"Debug mode is {'on' if app.config['DEBUG'] else 'off'}.")
 
 db = MongoEngine(app)
 
+def import_views():
+    from app import views as views
 
-from app import views
+import_views() 
