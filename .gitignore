@@ -1,0 +1,27 @@
+
+# ignore python cache/tests/virtual envs files
+*.pyc
+__pycache__/
+
+instance/
+
+# unit testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# linting using ruff
+.ruff_cache/
+
+# virtual environments
+.pyenv/
+.venv/
+venv/
+
+# .env files
+.env
+.*.env
+
+# ignore vs code
+.vscode/
+

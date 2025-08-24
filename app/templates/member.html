@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block extraStyle %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+{% endblock %}
+
+
+{% block content %}
+
+
+  <section id="features" class="features" style="padding-top: 100px;">
+        
+   <div class="container">
+     <!-- ########## -->
+ <!--  modal -->
+  <div class="modal fade" id="Modal-{{member['id']}}" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body ">
+
+        <div class="content">
+          <div class="contents">
+
+            <form action="/member/{{member['id']}}" method="post">
+                  
+              <div class="form-group first" style="margin-bottom: 5px;">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{member['name']}}">
+              
+
+              </div>
+
+              <div class="form-group first" style="margin-bottom: 5px;">
+                <label for="email">Email</label>
+                <input type="text" class="form-control"  id="email" name="email" value={{member['email']}}>
+              
+
+              </div>
+              
+              <div class="form-group last mb-4">
+                <label for="balance">Balance:</label>
+                <input type="text" class="form-control"  name="balance" value={{member['balance']}} >
+                
+              </div>
+              <div class="form-group last mb-4">
+                <label for="active">Active:</label>
+                <input type="checkbox" 
+                  {% if member['active'] %}
+                    checked
+                  {% endif%}
+                  name="active" >
+                
+              </div>
+              
+          
+
+              <input type="submit" value="Modify" class="btn btn-block btn-primary">
+              
+            </form>
+          </div>
+        </div>
+
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <div class="d-inline-flex align-items-center justify-content-center align-self-center" style="position:absolute; top:20%; left:35%; z-index:5">
+    <div class="errors">
+      {% for category, message in get_flashed_messages(with_categories=true)  %}
+
+        <div class="alert alert-{{category}} alert-dismissible fade show">
+            <button type="button" class="close" data-dismiss="alert" 
+              aria-label="Close" aria-hidden="true"> &times;</button>
+            {{ message }}&ThickSpace; &ThickSpace;
+        </div>
+
+      {% endfor %}  
+
+    </div>
+  </div>
+
+  <!-- ############## -->    
+      <header class="section-header" >
+        <!-- <h2>Features</h2> -->
+        <p>Member Profile</p>
+      </header>
+
+      <!-- Feature Icons -->
+      <div class="row feature-icons" data-aos="fade-up">
+
+        <h3>{{member['name']}}</h3>
+        
+        <div class="container">
+          <div class="row">
+
+            <div class="col-xl-4 text-center" data-aos="fade-right" data-aos-delay="100">
+              <img src="/img/member.png" class="img-fluid p-4" alt="">  
+            </div>
+
+            <div class="col-xl-8 d-flex content">
+
+
+                <div class="col icon-box-1 " data-aos="fade-up">
+                  <div>
+                    <h4>{{member['name']}}</h4>
+                  </div>
+
+                  <p>Email: <span>{{member['email']}}</span> </p>
+                  <p>Username: <span>{{member['username']}}</span> </p>
+                  <p>Active: <span>{{member['active']}}</span> </p>
+                  <p>Balance: <span>{{member['balance']}}</span> </p>
+                  <p>Total Purchase: <span>{{member['total_purchased']}}</span> </p>
+
+                  <div name = "members" id = {{member['id']}} 
+                    {% if 'logged_in' in session  %}
+                      {% if not session['user'].get('admin') %}
+                        style="display: none;"
+                      {% endif %}
+                    {% else %}
+                      style="display: none;"
+                    {% endif %}
+                  >
+                    <button  type="button"  class="btn btn-primary" data-toggle="modal" data-target="#Modal-{{member['id']}}">
+                        Modify
+                      </button>
+                    
+                      
+
+                    <button class="btn" onclick=checkId(this) style="background-color: red;">Remove</button>
+                  </div>
+                  
+                  
+
+                </div>                        
+
+                <div class="col icon-box-2" data-aos="fade-up">
+                
+                  <div class="dropdown">
+                    <button class="btn btn-secondary  dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                      Current Books
+                    </button>
+                    <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdownMenuButton1" style="overflow-y:auto; max-height:40vh">
+                      
+                      {% if member['current_book'] %}
+                        {% for current_book in member['current_book'] %}
+                          <li class="dropdown-item" style="white-space: normal;">
+                            <div class="d-flex align-items-center rounded">
+                              <div class="p-2 w-100 ">{{current_book['title']}} </div>
+                              <div class="p-2 w-50 " 
+                                {% if 'logged_in' in session  %}
+                                  {% if not session['user'].get('admin') %}
+                                    style="display: none;"
+                                  {% endif %}
+                                {% else %}
+                                  style="display: none;"
+                                {% endif %}
+                              >
+                                <button type="button" user="{{member['username']}}" book="{{current_book['title']}}" id="{{current_book['id']}}"" onclick="returnBook(this)" class="btn btn-success">Return</button>
+                              </div>
+                            </div>
+                          </li>
+                        {% endfor %}
+
+                      {% else %}
+                        <li class="dropdown-item" style="white-space: normal;">No Record Found</li>
+                      {% endif %}
+                      
+                    </ul>
+                  </div>
+
+                  <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                      Issued Books
+                    </button>
+                    <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdownMenuButton2" style="overflow-y:auto; max-height:40vh">
+                      
+                      {% if member['issued_books'] %}
+                        {% for issued_books in member['issued_books'] %}
+                          <li class="dropdown-item" style="white-space: normal;">
+                            <div class="d-flex align-items-center rounded">
+                              <div class="p-2 w-100 ">{{issued_books['title']}} </div>
+                            </div>
+                          </li>
+                        {% endfor %}
+
+                      {% else %}
+                        <li class="dropdown-item" style="white-space: normal;">No Record Found</li>
+                      {% endif %}
+                      
+                    </ul>
+
+                  </div>
+
+                </div>                                              
+                
+
+                                  
+
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- End Feature Icons -->          
+
+  </section>
+
+
+{% endblock %}
+
+
+{% block extraScript %}
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+{% endblock %}
+
+
