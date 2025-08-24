@@ -71,6 +71,7 @@ jobs:
         run: |
           echo '### Test Coverage Report' >> $GITHUB_STEP_SUMMARY
           coverage report >> $GITHUB_STEP_SUMMARY
+        if: ${{ always() }}
 
       - name: Pytest coverage comment in PR
         uses: MishaKav/pytest-coverage-comment@main
