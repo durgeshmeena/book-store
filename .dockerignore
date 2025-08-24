@@ -1,0 +1,21 @@
+# Ignore python virtual environment, cache and compiled files
+
+# git files
+.git
+.gitignore
+
+# python venv 
+.venv/
+.pyenv/
+
+# python cache and compiled files
+__pycache__/
+*/__pycache__
+*.pyc
+
+# Ignore bat files and other non-Python files
+*/*.bat
+
+# Ignore docker-related files
+docker/
+scripts/
