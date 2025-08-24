@@ -1,22 +1,20 @@
 import datetime
-from werkzeug.security import  generate_password_hash, check_password_hash 
 
 from mongoengine import (
-    BooleanField, 
-    DateTimeField, 
-    DateField,
-    Document, 
+    BooleanField,
+    DateTimeField,
+    Document,
     FloatField,
     IntField,
-    ListField, 
-    ObjectIdField,
-    ReferenceField ,
-    StringField, 
+    ListField,
+    ReferenceField,
     SequenceField,
+    StringField,
 )
-
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # ========== Database Models ==============
+
 
 class Book(Document):
     bookID = StringField()
@@ -35,7 +33,6 @@ class Book(Document):
     stock = IntField(default=10)
     issue_count = IntField(default=0)
     available = BooleanField(default=True)
-
 
 
 class Member(Document):
@@ -63,15 +60,9 @@ class Member(Document):
         return self.admin
 
 
-
-
 class Transaction(Document):
     id = SequenceField(primary_key=True)
     member = StringField()
     book = StringField()
-    borrow = BooleanField(required=True,default=True)
+    borrow = BooleanField(required=True, default=True)
     date = DateTimeField(default=datetime.datetime.now)
-
-
-
-
