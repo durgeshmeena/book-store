@@ -72,6 +72,7 @@ jobs:
           echo '# Test Coverage Report' >> $GITHUB_STEP_SUMMARY
           echo '---' >> $GITHUB_STEP_SUMMARY
           coverage report >> $GITHUB_STEP_SUMMARY
+        # always show coverage report in summary
         if: ${{ always() }}
 
       - name: Pytest coverage comment in PR
@@ -83,7 +84,8 @@ jobs:
           junitxml-path: junit/test-results.xml
           junitxml-title: Pytest Unit Tests Summary
           report-only-changed-files: true
-        if: ${{ always() }}  
+        # only run this step for PRs
+        if: ${{ github.event_name == 'pull_request' }} 
 
   Build_and_Push:
     runs-on: ubuntu-latest
