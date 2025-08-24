@@ -61,11 +61,26 @@ jobs:
           pip install -r dev-requirements.txt
       - name: Run tests with pytest
         run: |
-          pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          pytest --doctest-modules --junitxml=junit/test-results.xml --cov=app --cov-report=xml --cov-report=html --cov-report=term-missing
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: junit/test-results.xml
         # always run this step to publish test results when there are test failures
-        if: ${{ always() }} 
+        if: ${{ always() }}
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov
+
+      - name: Pytest coverage comment in PR
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-xml-coverage-path: coverage.xml
+          title: Pytest Coverage Report
+          create-new-comment: true
+          junitxml-path: junit/test-results.xml
+          junitxml-title: Pytest Unit Tests Summary
+          report-only-changed-files: true
