@@ -25,3 +25,8 @@ venv/
 # ignore vs code
 .vscode/
 
+# terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
