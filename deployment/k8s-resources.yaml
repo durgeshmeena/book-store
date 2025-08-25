@@ -1,0 +1,96 @@
+# ===========  Kubernetes resources  ==============
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 'book-store'
+---
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-store
+  namespace: 'book-store'
+  labels:
+    app: book-store  
+spec:
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  selector:
+    app: book-store
+---
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-store
+  namespace: 'book-store'
+  labels:
+    app: book-store
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-store
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "19001"
+        prometheus.io/scrape: "true"
+      labels:
+        app: book-store
+    spec:
+      containers:
+      - name: book-store
+        command:
+        - gunicorn
+        args:
+        - 'app:app'
+        - '-b'
+        - '0.0.0.0:8000'
+        - '--access-logfile'
+        - '-'
+        envFrom:
+        - secretRef:
+            name: book-store
+
+        image: durgeshk19134/book-store:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            memory: 500Mi
+            cpu: 200m
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+      imagePullSecrets: []
+---
