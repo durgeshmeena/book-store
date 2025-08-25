@@ -4,10 +4,22 @@ on:
     branches:
       - main
       - release/v*
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'config.py'
+      - 'requirements.txt'
+      - 'dev-requirements.txt'
   pull_request:
     branches:
       - main
       - release/v*
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'config.py'
+      - 'requirements.txt'
+      - 'dev-requirements.txt'
   workflow_dispatch:
 
 permissions:
@@ -100,13 +112,19 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+        # setup QEMU to build Multi-platform images
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: true
           context: .
           file: ./docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest

@@ -22,6 +22,11 @@ def home():
     return render_template("home.html", active_home=True)
 
 
+@app.route("/healthz")
+def health_check():
+    return {"status": "healthy"}, 200
+
+
 @app.errorhandler(404)
 def invalid_route(error):
     app.logger.error("Invalid route accessed: %s", error)
