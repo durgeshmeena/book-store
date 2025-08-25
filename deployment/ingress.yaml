@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: book-store
+  namespace: book-store
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: book-store.centralindia.cloudapp.azure.com
+      http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: book-store
+                port:
+                  number: 8000
+            path: /
