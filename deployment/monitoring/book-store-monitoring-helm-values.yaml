@@ -1,0 +1,45 @@
+
+# create resources serviceMonitor and podMonitor for book-store
+prometheus:
+  additionalServiceMonitors:
+  - name: book-store-service-monitor
+    ## Label selector for services to which this ServiceMonitor applies
+    selector:
+      matchLabels:
+        app: book-store
+
+    ## Namespaces from which services are selected
+    namespaceSelector:
+      matchNames:
+        - book-store
+
+    ## Endpoints of the selected service to be monitored
+    endpoints:
+      ## Name of the endpoint's service port
+      - port: http
+      ## Interval at which metrics should be scraped
+        interval: 30s
+      ## HTTP path to scrape for metrics
+      #   path: /metrics
+      ## HTTP scheme to use for scraping
+        # scheme: http
+
+  
+  additionalPodMonitors:
+  ## Name of the PodMonitor to create
+  - name: book-store-pod-monitor
+    ## Label selector for pods to which this PodMonitor applies
+    selector:
+      matchLabels:
+        app: book-store
+
+    ## Namespaces from which pods are selected
+    namespaceSelector:
+      ## Explicit list of namespace names to select
+      matchNames:
+        - book-store
+
+    ## Endpoints of the selected pods to be monitored
+    podMetricsEndpoints:
+      - port: http
+        interval: 30s
