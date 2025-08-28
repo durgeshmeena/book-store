@@ -4,7 +4,8 @@ COPY requirements.txt /requirements.txt
 RUN ln -s /usr/local/bin/python3 /usr/bin/python3 && \
     /usr/bin/python3 -m venv /venv && \
     /venv/bin/pip install --disable-pip-version-check -r /requirements.txt && \
-    /venv/bin/pip install --disable-pip-version-check opentelemetry-distro opentelemetry-exporter-prometheus
+    /venv/bin/pip install --disable-pip-version-check opentelemetry-distro opentelemetry-exporter-prometheus && \
+    opentelemetry-bootstrap -a install
 
 # Copy the virtualenv into a distroless image
 FROM gcr.io/distroless/python3-debian12:nonroot AS runtime

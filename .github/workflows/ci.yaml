@@ -10,6 +10,7 @@ on:
       - 'config.py'
       - 'requirements.txt'
       - 'dev-requirements.txt'
+      - 'docker/**'
   pull_request:
     branches:
       - main
@@ -20,6 +21,7 @@ on:
       - 'config.py'
       - 'requirements.txt'
       - 'dev-requirements.txt'
+      - 'docker/**'
   workflow_dispatch:
 
 permissions:
