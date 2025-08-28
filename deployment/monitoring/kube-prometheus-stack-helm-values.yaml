@@ -1,0 +1,456 @@
+##
+global:
+  ## Global image registry to use if it needs to be overridden for some specific use cases (e.g local registries, custom images, ...)
+  imageRegistry: ""
+
+  imagePullSecrets: []
+  # - name: "image-pull-secret"
+  # or
+  # - "image-pull-secret"
+
+# Disable default rules and enable required rules for capturing container metrics
+defaultRules:
+  create: true
+  rules:
+    alertmanager: false
+    etcd: false
+    configReloaders: false
+    general: false
+    k8sContainerCpuUsageSecondsTotal: true  # Keep CPU metrics
+    k8sContainerMemoryCache: true           # Keep memory metrics
+    k8sContainerMemoryRss: true             # Keep memory metrics
+    k8sContainerMemorySwap: false
+    k8sContainerResource: true              # Keep container resource metrics
+    k8sContainerMemoryWorkingSetBytes: true # Keep memory metrics
+    k8sPodOwner: true                      # Keep pod ownership metrics
+    kubeApiserverAvailability: false
+    kubeApiserverBurnrate: false
+    kubeApiserverHistogram: false
+    kubeApiserverSlos: false
+    kubeControllerManager: false
+    kubelet: true                          # Keep kubelet metrics
+    kubeProxy: false
+    kubePrometheusGeneral: false
+    kubePrometheusNodeRecording: false
+    kubernetesApps: true                   # Keep basic app metrics
+    kubernetesResources: true              # Keep resource metrics
+    kubernetesStorage: false
+    kubernetesSystem: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+    kubeStateMetrics: true                 # Keep kube-state-metrics
+    network: false
+    node: false
+    nodeExporterAlerting: false
+    nodeExporterRecording: false
+    prometheus: false
+    prometheusOperator: false
+    windows: false
+
+## disable windows monitoring
+windowsMonitoring:
+  ## Deploys the windows-exporter and Windows-specific dashboards and rules (job name must be 'windows-exporter')
+  enabled: false
+
+## Configuration for alertmanager
+## disable alertmanager
+alertmanager:
+  ## Deploy alertmanager
+  enabled: false
+
+## Configuration for Grafana
+## Using default values from https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+grafana:
+  enabled: true
+  ## Deploy default dashboards
+  defaultDashboardsEnabled: false   # disable default dashboards
+
+  ##
+  operator:
+    ## Enable references to ConfigMaps containing dashboards in GrafanaDashboard CRs
+    ## Set to true to allow dashboards to be loaded from ConfigMap references
+    dashboardsConfigMapRefEnabled: false
+
+  ## Timezone for the default dashboards
+  defaultDashboardsTimezone: utc
+
+
+  adminUser: admin
+  adminPassword: durgs-book-store-prom-operator
+
+  ingress:
+    ## If true, Grafana Ingress will be created
+    enabled: true
+
+    ## IngressClassName for Grafana Ingress.
+    ingressClassName: nginx
+
+    ## Annotations for Grafana Ingress
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+
+
+    ## Hostnames.
+    hosts: 
+     - grafana-monitoring-book-store.centralindia.cloudapp.azure.com
+
+    ## Path for grafana ingress
+    path: /
+
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      # Allow discovery in all namespaces for dashboards
+      searchNamespace: ALL
+
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+      isDefaultDatasource: true
+
+      name: Prometheus
+      uid: prometheus
+
+      ## URL of prometheus datasource
+      ##
+      url: http://kube-prometheus-stack-prometheus:9090
+
+
+      ## Field with internal link pointing to existing data source in Grafana.
+      ## Can be provisioned via additionalDataSources
+      exemplarTraceIdDestinations: {}
+        # datasourceUid: Jaeger
+        # traceIdLabelName: trace_id
+        # urlDisplayLabel: View traces
+      alertmanager:
+        enabled: false
+
+  ## Passed to grafana subchart and used by servicemonitor below
+  ##
+  service:
+    portName: http-web
+    ipFamilies: []
+    ipFamilyPolicy: ""
+
+  serviceMonitor:
+    # If true, a ServiceMonitor CRD is created for a prometheus operator
+    # https://github.com/prometheus-operator/prometheus-operator
+    enabled: false
+
+    # Path to use for scraping metrics. Might be different if server.root_url is set
+    # in grafana.ini
+    path: "/metrics"
+
+## Flag to disable all the kubernetes component scrapers
+kubernetesServiceMonitors:
+  enabled: true
+
+## Component scraping the kube api server
+kubeApiServer:
+  enabled: false
+
+## Component scraping the kubelet and kubelet-hosted cAdvisor
+kubelet:
+  enabled: true
+
+## Component scraping the kube controller manager
+kubeControllerManager:
+  enabled: false
+
+## Component scraping coreDns. Use either this or kubeDns
+coreDns:
+  enabled: false
+
+## Component scraping kubeDns. Use either this or coreDns
+kubeDns:
+  enabled: false
+
+## Component scraping etcd
+kubeEtcd:
+  enabled: false
+
+## Component scraping kube scheduler
+kubeScheduler:
+  enabled: false
+
+## Component scraping kube proxy
+kubeProxy:
+  enabled: false
+
+## Component scraping kube state metrics
+# enable kube-state-metrics enabled as it's needed for basic pod/container metrics
+kubeStateMetrics:
+  enabled: true
+
+## Deploy node exporter as a daemonset to all nodes
+nodeExporter:
+  enabled: false
+
+## Manages Prometheus and Alertmanager components
+prometheusOperator:
+  enabled: true
+
+  kubeletService:
+    ## If true, the operator will create and maintain a service for scraping kubelets
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/helm/prometheus-operator/README.md
+    enabled: true
+    namespace: kube-system
+    selector: ""
+    ## Use '{{ template "kube-prometheus-stack.fullname" . }}-kubelet' by default
+    name: ""
+
+  ## Create Endpoints objects for kubelet targets.
+  kubeletEndpointsEnabled: true
+  ## Create EndpointSlice objects for kubelet targets.
+  kubeletEndpointSliceEnabled: false
+
+  ## Create a servicemonitor for the operator
+  serviceMonitor:
+    ## If true, create a serviceMonitor for prometheus operator
+    selfMonitor: false
+
+
+  ## Resource limits & requests
+  resources: {}
+  # limits:
+  #   cpu: 200m
+  #   memory: 200Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 100Mi
+
+  ## Prometheus-operator image
+  image:
+    registry: quay.io
+    repository: prometheus-operator/prometheus-operator
+    # if not set appVersion field from Chart.yaml is used
+    tag: ""
+    sha: ""
+    pullPolicy: IfNotPresent
+
+
+  ## Prometheus-config-reloader
+  prometheusConfigReloader:
+    image:
+      registry: quay.io
+      repository: prometheus-operator/prometheus-config-reloader
+      # if not set appVersion field from Chart.yaml is used
+      tag: ""
+      sha: ""
+
+    # resource config for prometheusConfigReloader
+    resources: {}
+      # requests:
+      #   cpu: 200m
+      #   memory: 50Mi
+      # limits:
+      #   cpu: 200m
+      #   memory: 50Mi
+
+
+## Deploy a Prometheus instance
+prometheus:
+  enabled: true
+
+  ## Configuration for Prometheus service
+  service:
+    enabled: true
+    ## Port for Prometheus Service to listen on
+    port: 9090
+  
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+
+    annotations: {}
+    labels: {}
+
+    ## Hostnames.
+    hosts:
+      - prometheus-monitoring-book-store.centralindia.cloudapp.azure.com
+
+    ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
+    paths:
+    - /
+
+
+  serviceMonitor:
+    ## If true, create a serviceMonitor for prometheus
+    selfMonitor: false
+
+  ## Settings affecting prometheusSpec
+  ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#prometheusspec
+  prometheusSpec:
+    ## WebTLSConfig defines the TLS parameters for HTTPS
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#webtlsconfig
+    web: {}
+
+    ## Image of Prometheus.
+    image:
+      registry: quay.io
+      repository: prometheus/prometheus
+      tag: v3.5.0
+      sha: ""
+      pullPolicy: IfNotPresent
+
+    ## External URL at which Prometheus will be reachable.
+    externalUrl: ""
+
+    ## ServiceMonitors to be selected for target discovery.
+    ## If {}, select all ServiceMonitors
+    serviceMonitorSelector: {}
+    ## Example which selects ServiceMonitors with label "prometheus" set to "somelabel"
+    # serviceMonitorSelector:
+    #   matchLabels:
+    #     prometheus: somelabel
+
+    ## Namespaces to be selected for ServiceMonitor discovery.
+    serviceMonitorNamespaceSelector: {}
+    ## Example which selects ServiceMonitors in namespaces with label "prometheus" set to "somelabel"
+    # serviceMonitorNamespaceSelector:
+    #   matchLabels:
+    #     prometheus: somelabel
+
+    ## PodMonitors to be selected for target discovery.
+    ## If {}, select all PodMonitors
+    podMonitorSelector: {}
+    ## Example which selects PodMonitors with label "prometheus" set to "somelabel"
+    # podMonitorSelector:
+    #   matchLabels:
+    #     prometheus: somelabel
+
+    ## If nil, select own namespace. Namespaces to be selected for PodMonitor discovery.
+    podMonitorNamespaceSelector: {}
+    ## Example which selects PodMonitor in namespaces with label "prometheus" set to "somelabel"
+    # podMonitorNamespaceSelector:
+    #   matchLabels:
+    #     prometheus: somelabel
+
+
+    ## Prefix used to register routes, overriding externalUrl route.
+    ## Useful for proxies that rewrite URLs.
+    routePrefix: /
+
+    ## Resource limits & requests
+    resources: {}
+    # requests:
+    #   memory: 400Mi
+  
+  additionalServiceMonitors: []
+  ## Name of the ServiceMonitor to create
+  # - name: ""
+    ## Additional labels to set used for the ServiceMonitorSelector. Together with standard labels from
+    ## the chart
+    # additionalLabels: {}
+
+    ## Service label for use in assembling a job name of the form <label value>-<port>
+    ## If no label is specified, the service name is used.
+    # jobLabel: ""
+
+
+    ## Label selector for services to which this ServiceMonitor applies
+    # selector: {}
+      ## Example which selects all services to be monitored
+      ## with label "monitoredby" with values any of "example-service-1" or "example-service-2"
+      # matchExpressions:
+      #   - key: "monitoredby"
+      #     operator: In
+      #     values:
+      #       - example-service-1
+      #       - example-service-2
+
+      ## label selector for services
+      ##
+      # matchLabels: {}
+
+    ## Namespaces from which services are selected
+    # namespaceSelector:
+      ## Match any namespace
+      # any: false
+
+      ## Explicit list of namespace names to select
+      # matchNames: []
+
+    ## Endpoints of the selected service to be monitored
+    # endpoints: []
+      ## Name of the endpoint's service port
+      ## Mutually exclusive with targetPort
+      # - port: ""
+
+      ## Name or number of the endpoint's target port
+      ## Mutually exclusive with port
+      # - targetPort: ""
+
+      ## Interval at which metrics should be scraped
+      #   interval: 30s
+
+      ## HTTP path to scrape for metrics
+      #   path: /metrics
+
+      ## HTTP scheme to use for scraping
+      #   scheme: http
+
+  
+  additionalPodMonitors: []
+  ## Name of the PodMonitor to create
+  # - name: ""
+
+    ## Additional labels to set used for the PodMonitorSelector. Together with standard labels from
+    ## the chart
+    # additionalLabels: {}
+
+    ## Pod label for use in assembling a job name of the form <label value>-<port>
+    ## If no label is specified, the pod endpoint name is used.
+    # jobLabel: ""
+
+    ## Label selector for pods to which this PodMonitor applies
+    ##
+    # selector: {}
+      ## Example which selects all Pods to be monitored
+      ## with label "monitoredby" with values any of "example-pod-1" or "example-pod-2"
+      # matchExpressions:
+      #   - key: "monitoredby"
+      #     operator: In
+      #     values:
+      #       - example-pod-1
+      #       - example-pod-2
+
+      ## label selector for pods
+      ##
+      # matchLabels: {}
+
+    ## PodTargetLabels transfers labels on the Kubernetes Pod onto the target.
+    ##
+    # podTargetLabels: {}
+
+    ## SampleLimit defines per-scrape limit on number of scraped samples that will be accepted.
+    ##
+    # sampleLimit: 0
+
+    ## Namespaces from which pods are selected
+    ##
+    # namespaceSelector:
+      ## Match any namespace
+      ##
+      # any: false
+
+      ## Explicit list of namespace names to select
+      ##
+      # matchNames: []
+
+    ## Endpoints of the selected pods to be monitored
+    ## https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#podmetricsendpoint
+    ##
+    # podMetricsEndpoints: []
+
+    ## Fallback scrape protocol used by Prometheus for scraping metrics
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#monitoring.coreos.com/v1.ScrapeProtocol
+    ##
+    # fallbackScrapeProtocol: ""
+
+
+## Setting to true produces cleaner resource names, but requires a data migration because the name of the persistent volume changes. Therefore this should only be set once on initial installation.
+cleanPrometheusOperatorObjectNames: true
