@@ -127,4 +127,4 @@ jobs:
           file: ./docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:v0.0.1
