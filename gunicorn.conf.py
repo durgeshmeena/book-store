@@ -1,6 +1,6 @@
 
-# opentelemetry auto instrumentation doesn’t work well with application servers (Gunicorn, uWSGI) 
-# which are based on the pre-fork web server model. 
+# opentelemetry auto instrumentation doesn’t work well with application servers (Gunicorn, uWSGI)
+# which are based on the pre-fork web server model.
 # https://opentelemetry-python.readthedocs.io/en/latest/examples/fork-process-model/README.html#working-with-fork-process-models
 
 # Github Issues:
@@ -11,7 +11,7 @@
 # for gunicorn, we can use the post_fork hook to initialize the auto instrumentation in each worker process.
 
 # --- Gunicorn Hook ---
-def post_fork(server, worker):
+def post_fork(_server, worker):
     # https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/opentelemetry-instrumentation#programmatic-auto-instrumentation
     from opentelemetry.instrumentation import auto_instrumentation
     auto_instrumentation.initialize()
