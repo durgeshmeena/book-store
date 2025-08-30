@@ -14,7 +14,7 @@ permissions:
  
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} or github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,7 +24,7 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         run: |
-          echo "${KUBE_CONFIG_DATA}" | base64 --decode > kubeconfig
+          echo -e "${KUBE_CONFIG_DATA}" | base64 --decode > kubeconfig
           echo "Kubeconfig file created"
           echo ""
           export KUBECONFIG=./kubeconfig
@@ -49,10 +49,12 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           MONGO_URI: ${{ secrets.MONGO_URI }}
         run: |
+          export KUBECONFIG=./kubeconfig
           bash ./scripts/deploy_application.sh    
 
       - name: Deploy Monitoring Stack to Kubernetes
         env:
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
         run: |
+          export KUBECONFIG=./kubeconfig
           bash ./scripts/prometheus-community_deployment.sh
