@@ -18,6 +18,6 @@ WORKDIR /application
 
 USER nonroot
 
-EXPOSE 8000 9464
+EXPOSE 8000
 ENTRYPOINT ["gunicorn"]
 CMD ["app:app", "--bind=0.0.0.0:8000"]
