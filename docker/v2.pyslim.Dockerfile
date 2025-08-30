@@ -1,7 +1,3 @@
-# Build a virtualenv using the appropriate Debian release
-# * Install python3-venv for the built-in Python3 venv module (not installed by default)
-# * Install gcc libpython3-dev to compile C Python modules
-# * In the virtualenv: Update pip setuputils and wheel to support building new packages
 # Build the virtualenv as a separate step: Only re-execute this step when requirements.txt changes
 FROM python:3.11-slim AS build-venv
 COPY requirements.txt /requirements.txt
