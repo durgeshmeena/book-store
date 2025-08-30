@@ -20,3 +20,4 @@ helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheu
 
 # create configMap containgin grafana dashboard for book-store
 kubectl apply -f ./deployment/monitoring/book-store-grafana-dashboard-config.yaml
+kubectl apply -f ./deployment/monitoring/flask-app-internal-metrics-grafana-dashboard-config.yaml
