@@ -1,0 +1,301 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: book-store-internal-metrices-dashboard
+  namespace: monitoring 
+  labels:
+    grafana_dashboard: "1"
+data:
+  book-store-internal-metrices-dashboard.json: |-
+    {
+      "__inputs": [],
+      "__requires": [],
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "panels": [],
+          "title": "Key Performance Indicators (RED Method)",
+          "type": "row"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 1 },
+          "id": 4,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Request Rate (RPS)",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "sum(rate(http_server_duration_milliseconds_count{service=\"$service_name\"}[$__rate_interval]))",
+              "legendFormat": "Total RPS",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 1 },
+          "id": 6,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Error Rate (%)",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "(sum(rate(http_server_duration_milliseconds_count{service=\"$service_name\", http_status_code=~\"5..\"}[$__rate_interval])) / sum(rate(http_server_duration_milliseconds_count{service=\"$service_name\"}[$__rate_interval]))) * 100",
+              "legendFormat": "Error Rate",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
+          "id": 8,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "P99 Latency",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_duration_milliseconds_bucket{service=\"$service_name\"}[$__rate_interval]))) / 1000",
+              "legendFormat": "P99 Latency",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+          "id": 101,
+          "panels": [],
+          "title": "HTTP Request Analysis",
+          "type": "row"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+          "gridPos": { "h": 9, "w": 24, "x": 0, "y": 10 },
+          "id": 10,
+          "options": {
+            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Request Latency by Quantile",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.99, sum by (le, http_target) (rate(http_server_duration_milliseconds_bucket{service=\"$service_name\"}[$__rate_interval]))) / 1000",
+              "legendFormat": "p99 - {{http_target}}",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.95, sum by (le, http_target) (rate(http_server_duration_milliseconds_bucket{service=\"$service_name\"}[$__rate_interval]))) / 1000",
+              "legendFormat": "p95 - {{http_target}}",
+              "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(0.50, sum by (le, http_target) (rate(http_server_duration_milliseconds_bucket{service=\"$service_name\"}[$__rate_interval]))) / 1000",
+              "legendFormat": "p50 - {{http_target}}",
+              "refId": "C"
+            }
+          ]
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+          "gridPos": { "h": 9, "w": 16, "x": 0, "y": 19 },
+          "id": 12,
+          "options": {
+            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "none" },
+            "stacking": { "mode": "normal" }
+          },
+          "title": "Request Rate by Status Code",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "sum by (http_status_code) (rate(http_server_duration_milliseconds_count{service=\"$service_name\"}[$__rate_interval]))",
+              "legendFormat": "{{http_status_code}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+          "gridPos": { "h": 9, "w": 8, "x": 16, "y": 19 },
+          "id": 14,
+          "options": {
+            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Active Requests",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "sum(http_server_active_requests{service=\"$service_name\"})",
+              "legendFormat": "Active Requests",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+          "id": 102,
+          "panels": [],
+          "title": "Python Process Health",
+          "type": "row"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": { "defaults": { "unit": "none" }, "overrides": [] },
+          "gridPos": { "h": 9, "w": 8, "x": 0, "y": 29 },
+          "id": 16,
+          "options": {
+            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Process CPU Usage",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "sum(rate(process_cpu_seconds_total{service=\"$service_name\"}[$__rate_interval]))",
+              "legendFormat": "CPU Usage (cores)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+          "gridPos": { "h": 9, "w": 8, "x": 8, "y": 29 },
+          "id": 18,
+          "options": {
+            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Process Memory Usage",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "sum(process_resident_memory_bytes{service=\"$service_name\"})",
+              "legendFormat": "Resident Memory (RSS)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(process_virtual_memory_bytes{service=\"$service_name\"})",
+              "legendFormat": "Virtual Memory",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+          "gridPos": { "h": 9, "w": 8, "x": 16, "y": 29 },
+          "id": 20,
+          "options": {
+            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Python GC Collections Rate",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "sum by (generation) (rate(python_gc_collections_total{service=\"$service_name\"}[$__rate_interval]))",
+              "legendFormat": "Generation {{generation}}",
+              "refId": "A"
+            }
+          ]
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 30,
+      "style": "dark",
+      "tags": ["opentelemetry", "flask"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": true, "text": "book-store", "value": "book-store" },
+            "datasource": "Prometheus",
+            "definition": "label_values(target_info, service_name)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Service Name",
+            "multi": false,
+            "name": "service_name",
+            "options": [],
+            "query": { "query": "label_values(target_info, service_name)", "refId": "StandardVariableQuery" },
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          }
+        ]
+      },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Book Store - Internal Metrices Dashboard",
+      "uid": "book-store-internal-metrics-dashboard",
+      "version": 1
+    }

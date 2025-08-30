@@ -1,11 +1,5 @@
 # ===========  Kubernetes resources  ==============
 ---
-# Namespace
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: 'book-store'
----
 # service.yaml
 apiVersion: v1
 kind: Service
@@ -41,36 +35,53 @@ spec:
       app: book-store
   template:
     metadata:
-      annotations:
-        prometheus.io/port: "19001"
-        prometheus.io/scrape: "true"
       labels:
         app: book-store
     spec:
       containers:
       - name: book-store
         command:
-        - opentelemetry-instrument
-        args:
-        - --traces_exporter 
-        - none
-        - --metrics_exporter
-        - prometheus
-        - --logs_exporter
-        - none
-        - --service_name
-        - book-store
         - gunicorn
-        - 'app:app'
-        - '-b'
-        - '0.0.0.0:8000'
-        - '--access-logfile'
+        args:
+        # Gunicorn specific args
+        - app:app
+        - --config
+        - gunicorn.conf.py
+        - --bind
+        - 0.0.0.0:8000
+        - --access-logfile
         - '-'
-        envFrom:
-        - secretRef:
-            name: book-store
+        env:
+        - name: OTEL_SERVICE_NAME
+          value: book-store
+        - name: OTEL_TRACES_EXPORTER
+          value: none
+        - name: OTEL_LOGS_EXPORTER
+          value: none
+        - name: OTEL_METRICS_EXPORTER
+          value: prometheus
+        - name: OTEL_EXPORTER_PROMETHEUS_HOST
+          value: "0.0.0.0"
+        - name: OTEL_EXPORTER_PROMETHEUS_PORT
+          value: "9464"
+        - name: OTEL_METRIC_EXPORT_INTERVAL
+          value: "5000"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: book-store
+              key: SECRET_KEY
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              name: book-store
+              key: MONGO_URI
+        
+        # envFrom:
+        # - secretRef:
+        #     name: book-store
 
-        image: durgeshk19134/book-store:latest
+        image: book-store:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
@@ -91,11 +102,11 @@ spec:
           periodSeconds: 10
         resources:
           limits:
-            memory: 500Mi
-            cpu: 200m
-          requests:
+            memory: 384Mi
             cpu: 100m
-            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

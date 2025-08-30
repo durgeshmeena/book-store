@@ -13,8 +13,19 @@ __pycache__/
 */__pycache__
 *.pyc
 
+# python test files
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+.nox/
+tests
+
 # Ignore bat files and other non-Python files
 */*.bat
+terraform
+images/
+screenshots/
 
 # Ignore docker-related files
 docker/

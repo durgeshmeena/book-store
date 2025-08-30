@@ -93,10 +93,17 @@ grafana:
 
     ## Hostnames.
     hosts: 
-     - grafana-monitoring-book-store.centralindia.cloudapp.azure.com
+     - monitoring-book-store.centralindia.cloudapp.azure.com
 
     ## Path for grafana ingress
-    path: /
+    path: /grafana
+
+  grafana.ini:
+    server:
+      domain: monitoring-book-store.centralindia.cloudapp.azure.com
+      root_url: "%(protocol)s://%(domain)s/grafana"
+      serve_from_sub_path: true
+
 
   sidecar:
     dashboards:
@@ -116,7 +123,7 @@ grafana:
 
       ## URL of prometheus datasource
       ##
-      url: http://kube-prometheus-stack-prometheus:9090
+      url: http://kube-prometheus-stack-prometheus:9090/prometheus
 
 
       ## Field with internal link pointing to existing data source in Grafana.
@@ -262,7 +269,7 @@ prometheus:
     port: 9090
   
   ingress:
-    enabled: true
+    enabled: false
     ingressClassName: nginx
 
     annotations: {}
@@ -270,11 +277,11 @@ prometheus:
 
     ## Hostnames.
     hosts:
-      - prometheus-monitoring-book-store.centralindia.cloudapp.azure.com
+      - monitoring-book-store.centralindia.cloudapp.azure.com
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     paths:
-    - /
+    - /prometheus
 
 
   serviceMonitor:
@@ -332,7 +339,7 @@ prometheus:
 
     ## Prefix used to register routes, overriding externalUrl route.
     ## Useful for proxies that rewrite URLs.
-    routePrefix: /
+    routePrefix: /prometheus
 
     ## Resource limits & requests
     resources: {}

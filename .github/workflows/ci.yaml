@@ -7,10 +7,10 @@ on:
     paths:
       - 'app/**'
       - 'tests/**'
-      - 'config.py'
+      - '*.py'
       - 'requirements.txt'
       - 'dev-requirements.txt'
-      - 'docker/**'
+      - 'docker/Dockerfile'
   pull_request:
     branches:
       - main
@@ -18,10 +18,10 @@ on:
     paths:
       - 'app/**'
       - 'tests/**'
-      - 'config.py'
+      - '*.py'
       - 'requirements.txt'
       - 'dev-requirements.txt'
-      - 'docker/**'
+      - 'docker/Dockerfile'
   workflow_dispatch:
 
 permissions:
