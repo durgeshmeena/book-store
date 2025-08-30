@@ -49,10 +49,12 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           MONGO_URI: ${{ secrets.MONGO_URI }}
         run: |
+          export KUBECONFIG=./kubeconfig
           bash ./scripts/deploy_application.sh    
 
       - name: Deploy Monitoring Stack to Kubernetes
         env:
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
         run: |
+          export KUBECONFIG=./kubeconfig
           bash ./scripts/prometheus-community_deployment.sh
