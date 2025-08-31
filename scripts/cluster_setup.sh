@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export KIND_EXPERIMENTAL_PROVIDER=podman
+
 # install kind
 function install_kind {
   curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
