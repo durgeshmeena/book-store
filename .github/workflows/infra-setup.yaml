@@ -142,13 +142,19 @@ jobs:
 
       - name: Destroy Cluster
         working-directory: ./terraform/cluster-creation
-        run: terraform destroy -auto-approve
+        run: |
+          terraform init 
+          terraform destroy -auto-approve
 
       - name: Destroy VM and Networking resources
         working-directory: ./terraform/vm-provision
-        run: terraform destroy -auto-approve
+        run: |
+          terraform init
+          terraform destroy -auto-approve
 
       - name: Destroy Azure Storage Account and Container for Terraform backend
         working-directory: ./terraform/azure-remote-storage
-        run: terraform destroy -auto-approve
+        run: |
+          terraform init
+          terraform destroy -auto-approve
       
