@@ -48,12 +48,14 @@ jobs:
         working-directory: ./terraform/azure-remote-storage
         run: terraform init
       
-      - name: Apply Terraform
-        working-directory: ./terraform/azure-remote-storage
-        run: terraform apply -auto-approve
+      # - name: Apply Terraform
+      #   working-directory: ./terraform/azure-remote-storage
+      #   run: terraform apply -auto-approve
 
       - name: Get and add ARM_ACCESS_KEY to repo secrets
         working-directory: ./terraform/azure-remote-storage
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           RESOURCE_GROUP_NAME=tf-devops-rg
           STORAGE_ACCOUNT_NAME=tfdevopsstorage
