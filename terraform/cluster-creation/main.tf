@@ -8,6 +8,13 @@ terraform {
       version = "~>3.0"
     }
   }
+
+  backend "azurerm" {
+    resource_group_name = "tf-devops-rg"
+    storage_account_name = "tfdevopsstorage"
+    container_name = "tfstate"
+    key = "cluster-creation.terraform.tfstate"
+  }
 }
 
 provider "azurerm" {
@@ -15,10 +22,13 @@ provider "azurerm" {
 }
 
 data "terraform_remote_state" "infra" {
-  backend = "local"
+  backend = "azurerm"
 
   config = {
-    path = "../vm-provision/terraform.tfstate"
+    resource_group_name = "tf-devops-rg"
+    storage_account_name = "tfdevopsstorage"
+    container_name = "tfstate"
+    key = "vm-provision.terraform.tfstate"
   }
   
 }
