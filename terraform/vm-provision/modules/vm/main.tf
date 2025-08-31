@@ -74,6 +74,14 @@ resource "azurerm_linux_virtual_machine" "vm" {
     version   = "latest"
   }
 
+}
+
+resource "null_resource" "download_tools" {
+
+  triggers = {
+    script_hash = filemd5("../../scripts/vm_tools.sh")
+  }
+
   provisioner "remote-exec" {
     script = "../../scripts/vm_tools.sh"
 

@@ -3,7 +3,7 @@
 sudo apt-get update -y
 
 # install required tools
-sudo apt-get install -y git curl podman grep sed awk
+sudo apt-get install -y git curl podman
 
 # ensure /usr/local/bin/
 sudo mkdir -p /usr/local/bin/
