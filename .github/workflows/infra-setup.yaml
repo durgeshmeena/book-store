@@ -96,12 +96,12 @@ jobs:
         run: terraform apply -auto-approve
 
   cluster-creation:
-    if: >-
+    needs: [azure-storage, vm-provision]
+    if: |
+      (${{ inputs.action == 'Create Cluster' || inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}) &&
       always() &&
       (needs.azure-storage.result == 'success' || needs.azure-storage.result == 'skipped') &&
-      (needs.vm-provision.result == 'success' || needs.vm-provision.result == 'skipped') &&
-      (${{ github.event.inputs.action == 'Create Cluster' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }})
-    needs: [azure-storage, vm-provision]
+      (needs.vm-provision.result == 'success' || needs.vm-provision.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
