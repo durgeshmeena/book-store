@@ -48,8 +48,14 @@ resource "null_resource" "fetch_kubeconfig" {
 
 }
 
+data "local_file" "kubeconfig" {
+  depends_on = [ null_resource.fetch_kubeconfig ]
+
+  filename = "${path.module}/../../azure-kubeconfig"
+}
+
 # save kubeconfig to terraform output
 output "kubeconfig" {
-  value     = file("${path.module}/../../azure-kubeconfig")
+  value     = data.local_file.kubeconfig.content
   sensitive = true
 }
