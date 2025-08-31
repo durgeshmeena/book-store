@@ -81,7 +81,7 @@ spec:
         # - secretRef:
         #     name: book-store
 
-        image: book-store:latest
+        image: durgeshk19134/book-store:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000

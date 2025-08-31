@@ -57,7 +57,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GIT_ACTION_GITHUB_TOKEN }}
         run: |
-          RESOURCE_GROUP_NAME=tf-devops-rg
+          RESOURCE_GROUP_NAME=tf-backend-rg
           STORAGE_ACCOUNT_NAME=tfdevopsstorage
           CONTAINER_NAME=tfstate
 

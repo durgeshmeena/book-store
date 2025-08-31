@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export KIND_EXPERIMENTAL_PROVIDER=podman
+
 # install kind
 function install_kind {
   curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
@@ -111,6 +113,7 @@ main() {
 
   echo ""
   echo "Creating public kubeconfig"
+  mkdir -p ~/.kube
   sudo cp /root/.kube/config ~/.kube/azure-public-kubeconfig
   # get the host IP again for replacement
   local host_ip=$(hostname -I | awk '{print $1}')
