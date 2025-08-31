@@ -43,7 +43,7 @@ resource "null_resource" "fetch_kubeconfig" {
   }
 
   provisioner "local-exec" {
-    command = "scp -O -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i ${local_file.ssh_private_key.filename} ${var.admin_username}@${var.vm_ip}:/home/${var.admin_username}/.kube/azure-public-kubeconfig ${path.module}/../../azure-kubeconfig && rm ${path.module}/id_rsa"
+    command = "scp -O -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i ${local_sensitive_file.ssh_private_key.filename} ${var.admin_username}@${var.vm_ip}:/home/${var.admin_username}/.kube/azure-public-kubeconfig ${path.module}/../../azure-kubeconfig && rm ${path.module}/id_rsa"
   }
 
 }
