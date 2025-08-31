@@ -21,9 +21,10 @@ permissions:
   actions: write
 
 env:
-  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}  
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
 
 jobs:
   azure-storage:
@@ -36,9 +37,7 @@ jobs:
       - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
@@ -55,18 +54,19 @@ jobs:
 
       - name: Get and add ARM_ACCESS_KEY to repo secrets
         working-directory: ./terraform/azure-remote-storage
+        env:
+          GH_TOKEN: ${{ secrets.GIT_ACTION_GITHUB_TOKEN }}
         run: |
           RESOURCE_GROUP_NAME=tf-devops-rg
           STORAGE_ACCOUNT_NAME=tfdevopsstorage
           CONTAINER_NAME=tfstate
 
           ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' --output tsv)
-          echo "$ACCESS_KEY" | gh secrets set ARM_ACCESS_KEY --repo ${{ github.repository }} --visibility=private
+          echo "$ACCESS_KEY" | gh secret set ARM_ACCESS_KEY --repo ${{ github.repository }}
 
 
   vm-provision:
     if: ${{ github.event.inputs.action == 'Provision VM and Networking resources' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
-    needs: azure-storage
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -75,9 +75,7 @@ jobs:
       - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
       
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
@@ -93,8 +91,7 @@ jobs:
         run: terraform apply -auto-approve
 
   cluster-creation:
-    if: ${{ github.event.inputs.action == 'Create Cluster' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
-    needs: [azure-storage, vm-provision]
+    if: ${{ inputs.action == 'Create Cluster' || inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -103,9 +100,7 @@ jobs:
       - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
@@ -120,10 +115,16 @@ jobs:
         working-directory: ./terraform/cluster-creation
         run: terraform apply -auto-approve
 
+      - name: Save kubeconfig(base64) to GitHub Secret
+        working-directory: ./terraform/cluster-creation
+        env:
+          GH_TOKEN: ${{ secrets.GIT_ACTION_GITHUB_TOKEN }}
+        run: |
+          KUBECONFIG_BASE64=$(base64 -w 0 ./azure-kubeconfig)
+          echo "$KUBECONFIG_BASE64" | gh secret set KUBE_CONFIG_DATA --repo ${{ github.repository }}
 
   destroy-all:
     if: ${{ github.event.inputs.action == 'Destroy all resources' }}
-    needs: [cluster-creation, vm-provision, azure-storage]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -132,9 +133,7 @@ jobs:
       - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
@@ -143,13 +142,19 @@ jobs:
 
       - name: Destroy Cluster
         working-directory: ./terraform/cluster-creation
-        run: terraform destroy -auto-approve
+        run: |
+          terraform init 
+          terraform destroy -auto-approve
 
       - name: Destroy VM and Networking resources
         working-directory: ./terraform/vm-provision
-        run: terraform destroy -auto-approve
+        run: |
+          terraform init
+          terraform destroy -auto-approve
 
       - name: Destroy Azure Storage Account and Container for Terraform backend
         working-directory: ./terraform/azure-remote-storage
-        run: terraform destroy -auto-approve
+        run: |
+          terraform init
+          terraform destroy -auto-approve
       
