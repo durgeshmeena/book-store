@@ -60,7 +60,7 @@ jobs:
           CONTAINER_NAME=tfstate
 
           ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' --output tsv)
-          echo "$ACCESS_KEY" | gh secrets set ARM_ACCESS_KEY --repo ${{ github.repository }} --visibility=private
+          echo "$ACCESS_KEY" | gh secret set ARM_ACCESS_KEY --repo ${{ github.repository }}
 
 
   vm-provision:
