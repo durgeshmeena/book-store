@@ -16,6 +16,7 @@ helm repo update
 helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
     --namespace monitoring --create-namespace \
     --debug \
+    --set grafana.adminPassword="$GRAFANA_ADMIN_PASSWORD" \
     -f ./deployment/monitoring/kube-prometheus-stack-helm-values.yaml \
     -f ./deployment/monitoring/book-store-monitoring-helm-values.yaml
 
