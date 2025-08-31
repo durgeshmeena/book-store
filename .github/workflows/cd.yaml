@@ -58,3 +58,8 @@ jobs:
         run: |
           export KUBECONFIG=./kubeconfig
           bash ./scripts/prometheus-community_deployment.sh
+
+      - name: Deploy Nginx Ingress Controller to Kubernetes
+        run: |
+          export KUBECONFIG=./kubeconfig
+          bash ./scripts/nginx-setup.sh    
