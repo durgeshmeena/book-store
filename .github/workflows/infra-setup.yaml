@@ -28,7 +28,8 @@ env:
 
 jobs:
   azure-storage:
-    if: ${{ github.event.inputs.action == 'Create Azure Storage Account and Container for Terraform backend' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
+    if: >-
+      ${{ github.event.inputs.action == 'Create Azure Storage Account and Container for Terraform backend' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -66,7 +67,9 @@ jobs:
 
 
   vm-provision:
-    if: ${{ github.event.inputs.action == 'Provision VM and Networking resources' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
+    if: >-
+      (needs.azure-storage.result == 'success' || needs.azure-storage.result == 'skipped') &&
+      (${{ github.event.inputs.action == 'Provision VM and Networking resources' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }})
     needs: azure-storage
     runs-on: ubuntu-latest
     steps:
@@ -92,7 +95,10 @@ jobs:
         run: terraform apply -auto-approve
 
   cluster-creation:
-    if: ${{ github.event.inputs.action == 'Create Cluster' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
+    if: >-
+      (needs.azure-storage.result == 'success' || needs.azure-storage.result == 'skipped') &&
+      (needs.vm-provision.result == 'success' || needs.vm-provision.result == 'skipped') &&
+      (${{ github.event.inputs.action == 'Create Cluster' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }})
     needs: [azure-storage, vm-provision]
     runs-on: ubuntu-latest
     steps:
