@@ -68,6 +68,7 @@ jobs:
 
   vm-provision:
     if: >-
+      always() &&
       (needs.azure-storage.result == 'success' || needs.azure-storage.result == 'skipped') &&
       (${{ github.event.inputs.action == 'Provision VM and Networking resources' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }})
     needs: azure-storage
@@ -96,6 +97,7 @@ jobs:
 
   cluster-creation:
     if: >-
+      always() &&
       (needs.azure-storage.result == 'success' || needs.azure-storage.result == 'skipped') &&
       (needs.vm-provision.result == 'success' || needs.vm-provision.result == 'skipped') &&
       (${{ github.event.inputs.action == 'Create Cluster' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }})
