@@ -113,6 +113,7 @@ main() {
 
   echo ""
   echo "Creating public kubeconfig"
+  mkdir -p ~/.kube
   sudo cp /root/.kube/config ~/.kube/azure-public-kubeconfig
   # get the host IP again for replacement
   local host_ip=$(hostname -I | awk '{print $1}')
