@@ -48,9 +48,9 @@ jobs:
         working-directory: ./terraform/azure-remote-storage
         run: terraform init
       
-      # - name: Apply Terraform
-      #   working-directory: ./terraform/azure-remote-storage
-      #   run: terraform apply -auto-approve
+      - name: Apply Terraform
+        working-directory: ./terraform/azure-remote-storage
+        run: terraform apply -auto-approve
 
       - name: Get and add ARM_ACCESS_KEY to repo secrets
         working-directory: ./terraform/azure-remote-storage
