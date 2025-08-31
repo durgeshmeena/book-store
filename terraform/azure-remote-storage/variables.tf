@@ -1,5 +1,5 @@
 variable "rg_name" {
-  default = "tf-devops-rg"
+  default = "tf-backend-rg"
 }
 
 variable "rg_location" {
