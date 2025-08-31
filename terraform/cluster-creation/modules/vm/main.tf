@@ -27,7 +27,7 @@ resource "null_resource" "setup_kind_cluster" {
 }
 
 # store ssh private key
-resource "local_file" "ssh_private_key" {
+resource "local_sensitive_file" "ssh_private_key" {
 
   content  = var.ssh_private_key
   filename = "${path.module}/id_rsa"
