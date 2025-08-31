@@ -10,7 +10,7 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name = "tf-devops-rg"
+    resource_group_name = "tf-backend-rg"
     storage_account_name = "tfdevopsstorage"
     container_name = "tfstate"
     key = "cluster-creation.terraform.tfstate"
@@ -25,7 +25,7 @@ data "terraform_remote_state" "infra" {
   backend = "azurerm"
 
   config = {
-    resource_group_name = "tf-devops-rg"
+    resource_group_name = "tf-backend-rg"
     storage_account_name = "tfdevopsstorage"
     container_name = "tfstate"
     key = "vm-provision.terraform.tfstate"
