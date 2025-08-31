@@ -16,6 +16,13 @@ terraform {
       version = "~>3.0"
     }
   }
+
+  backend "azurerm" {
+    resource_group_name = "tf-devops-rg"
+    storage_account_name = "tfdevopsstorage"
+    container_name = "tfstate"
+    key = "vm-provision.terraform.tfstate"
+  }
 }
 
 provider "azurerm" {
