@@ -19,12 +19,17 @@ provider "azurerm" {
   features {}
 }
 
-# resource group needs to be created first if this is the first tf provisioning
-# skipping this since resource group is created in vm-provision
+
+resource "azurerm_resource_group" "rg_backend" {
+  name     = var.rg_name
+  location = var.rg_location
+  
+}
+
 resource "azurerm_storage_account" "tfstate" {
   name                            = var.storage_account_name
-  resource_group_name             = var.rg_name
-  location                        = var.rg_location
+  resource_group_name             = azurerm_resource_group.rg_backend.name
+  location                        = azurerm_resource_group.rg_backend.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   allow_nested_items_to_be_public = false
