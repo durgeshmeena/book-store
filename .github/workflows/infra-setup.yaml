@@ -55,7 +55,7 @@ jobs:
       - name: Get and add ARM_ACCESS_KEY to repo secrets
         working-directory: ./terraform/azure-remote-storage
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GIT_ACTION_GITHUB_TOKEN }}
         run: |
           RESOURCE_GROUP_NAME=tf-devops-rg
           STORAGE_ACCOUNT_NAME=tfdevopsstorage
@@ -117,6 +117,13 @@ jobs:
         working-directory: ./terraform/cluster-creation
         run: terraform apply -auto-approve
 
+      - name: Save kubeconfig(base64) to GitHub Secret
+        working-directory: ./terraform/cluster-creation
+        env:
+          GH_TOKEN: ${{ secrets.GIT_ACTION_GITHUB_TOKEN }}
+        run: |
+          KUBECONFIG_BASE64=$(base64 -w 0 ./azure-kubeconfig)
+          echo "$KUBECONFIG_BASE64" | gh secret set KUBE_CONFIG_DATA --repo ${{ github.repository }}
 
   destroy-all:
     if: ${{ github.event.inputs.action == 'Destroy all resources' }}

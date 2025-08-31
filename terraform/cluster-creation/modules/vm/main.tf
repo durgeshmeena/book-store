@@ -47,3 +47,9 @@ resource "null_resource" "fetch_kubeconfig" {
   }
 
 }
+
+# save kubeconfig to terraform output
+output "kubeconfig" {
+  value     = file("${path.module}/../../azure-kubeconfig")
+  sensitive = true
+}
