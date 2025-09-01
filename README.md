@@ -60,7 +60,7 @@ This project demonstrates modern DevOps and Cloud-Native practices by building, 
 
 - Secure credential management – handled with GitHub Secrets.
 
-- Efficient builds – Docker layer caching + smart image tagging (Git commit SHA & latest).
+- Efficient builds – Docker layer caching
 
 ## 🔹 Observability & Monitoring
 
@@ -154,11 +154,11 @@ The Grafana dashboard provides insights into:
   <img width="1232" height="641" alt="Application-1-Members" src="https://github.com/user-attachments/assets/c82e5001-e6c1-4dfe-8fc9-d845ec66b6a9" />
 
 
-- Menber profile
+### Menber profile
   <img width="1436" height="609" alt="Application-1-Member-Profile" src="https://github.com/user-attachments/assets/7e9559de-d3a9-44f0-8f1a-8a5bd8b84a25" />
 
 
-- Transactions
+### Transactions
   <img width="1037" height="475" alt="Application-1-Transactions" src="https://github.com/user-attachments/assets/adcafa61-cd59-4c86-885d-18a67ccc47aa" />
 
 
