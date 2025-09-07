@@ -11,7 +11,6 @@ on:
           - Create Azure Storage Account and Container for Terraform backend
           - Provision VM and Networking resources
           - Create Cluster
-          - All (Create Storage, Provision VM and Create Cluster)
           - Destroy all resources
         default: 'None(default)'
 
@@ -25,10 +24,11 @@ env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
 
 jobs:
   azure-storage:
-    if: ${{ github.event.inputs.action == 'Create Azure Storage Account and Container for Terraform backend' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
+    if: ${{ github.event.inputs.action == 'Create Azure Storage Account and Container for Terraform backend' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -66,7 +66,7 @@ jobs:
 
 
   vm-provision:
-    if: ${{ github.event.inputs.action == 'Provision VM and Networking resources' || github.event.inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
+    if: ${{ github.event.inputs.action == 'Provision VM and Networking resources' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -91,7 +91,7 @@ jobs:
         run: terraform apply -auto-approve
 
   cluster-creation:
-    if: ${{ inputs.action == 'Create Cluster' || inputs.action == 'All (Create Storage, Provision VM and Create Cluster)' }}
+    if: ${{ inputs.action == 'Create Cluster' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
